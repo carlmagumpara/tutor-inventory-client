@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Form, Container, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 function Index(){
 	const navigate = useNavigate();
@@ -22,16 +23,37 @@ function Index(){
 		}
 	}
 
-	const onDelete = async(id)=>{
-		try{
-			const response = await axios.delete('http://localhost:8000/api/products/delete/'+id);
-			getData();
-		}catch(e){
-
-		}
+	const onDelete = (id) => {
+		Swal.fire({
+		  title: 'Do you want to delete this product?',
+		  icon: 'error',
+		  showCancelButton: true,
+		  confirmButtonText: 'Yes',
+		  denyButtonText: 'No',
+		}).then(async result => {
+		  /* Read more about isConfirmed, isDenied below */
+		  if (result.isConfirmed) {
+				try {
+					const response = await axios.delete('http://localhost:8000/api/products/delete/'+id);
+					getData();
+					Swal.fire('Deleted!', '', 'success');
+				} catch(e) {
+				}
+		  } else if (result.isDenied) {
+		  }
+		});
 	}
 
-	console.log(data);
+	const downloadPhoto = url => {
+    var link = document.createElement("a");
+    // If you don't know the name or want to use
+    // the webserver default set name = ''
+    link.setAttribute('download', url);
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+	};
 
 	return (
 		<Container>
@@ -42,6 +64,7 @@ function Index(){
 			  <thead>
 			    <tr>
 			      <th>#</th>
+			      <th>Photo</th>
 			      <th>Name</th>
 			      <th>Description</th>
 			      <th>UOM</th>
@@ -53,10 +76,14 @@ function Index(){
 			  	{data.map((item)=>{
 			  		return (
 			  			<tr key={item.id}>
+			  				<td>
+			  					<img src={item.photo} style={{ width: 100 }} />
+			  					<Button onClick={() => downloadPhoto(item.photo)}>Download</Button>
+			  				</td>
 			  			  <td>{item.id}</td>
 			  			  <td>{item.name}</td>
 			  			  <td>{item.description}</td>
-			  			  <td>{item.uom}</td>
+			  			  <td>{item.unit.name}</td>
 			  			  <td>{item.isActive ? 'Active' : 'Not Active'}</td>
 			  			  <td>
 			  			  	<Button variant="info" onClick={()=>{navigate("/products/edit/"+item.id)}} >Edit</Button>

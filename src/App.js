@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 import {BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Products from './components/Products'; 

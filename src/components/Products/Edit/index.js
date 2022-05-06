@@ -5,7 +5,8 @@ import axios from 'axios';
 
 function Index(){
 	const navigate = useNavigate();
-	const {id} = useParams();
+	const { id } = useParams();
+	const [units, setUnits] = useState([]);
 	const [state, setState] = useState({
 		name: '',
 		description: '',
@@ -14,6 +15,7 @@ function Index(){
 	});
 
 	useEffect(()=>{
+		fetchUnits();
 		getData();
 	},[]);
 
@@ -25,7 +27,17 @@ function Index(){
 		}catch(e){
 			console.log(e);
 		}
-	}
+	};
+
+	const fetchUnits = async () => {
+		try {
+		  const response = await axios.get('http://localhost:8000/api/products/units');
+			setUnits(response.data);
+		}
+		catch(e) {
+		  console.log(e);
+		}
+	};
 
 	const onChange = (event) => {
 		console.log(event.target.value);
@@ -33,9 +45,7 @@ function Index(){
 		  ...prevState,
 		  [event.target.name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value
 		}));
-	}
-
-	console.log(id);
+	};
 
 	const onSubmit = async (event) => {
 		event.preventDefault();
@@ -63,35 +73,33 @@ function Index(){
 			</Button>
 			<Form onSubmit={onSubmit}>
 				<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-				    <Form.Label>Email address</Form.Label>
-				    <Form.Control type="text" placeholder="name@example.com" name="name" value={state.name} onChange={onChange} />
-				  </Form.Group>
-				  <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-				    <Form.Label>Example textarea</Form.Label>
-				    <Form.Control as="textarea" rows={3} name="description" value={state.description} onChange={onChange}/>
-				  </Form.Group>
-				  <Form.Group className="mb-3">
-					  <Form.Select aria-label="Default select example" name="uom" value={state.uom} onChange={onChange}>
-					    <option>Open this select menu</option>
-					    <option value="1">One</option>
-					    <option value="2">Two</option>
-					    <option value="3">Three</option>
-					  </Form.Select>
-				  </Form.Group>
-				  <Form.Group className="mb-3">
-					  <Form.Check
-				          type={'checkbox'}
-				          label={`Please Check this`}
-				          id={`1`}
-				          value={`1`}
-				          name="isActive"
-				          checked={state.isActive}
-				          onChange={onChange}
-				       />
-				  </Form.Group>
-				  <Button variant="primary" type="submit">
-				      Submit
-				  </Button>
+			    <Form.Label>Name</Form.Label>
+			    <Form.Control type="text" name="name" value={state.name} onChange={onChange} />
+			  </Form.Group>
+			  <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+			    <Form.Label>Description</Form.Label>
+			    <Form.Control as="textarea" rows={3} name="description" value={state.description} onChange={onChange}/>
+			  </Form.Group>
+			  <Form.Group className="mb-3">
+				  <Form.Select aria-label="Default select example" name="uom_id" value={state.uom_id} onChange={onChange}>
+				    <option>Select UOM</option>
+				    {units.map(unit => <option key={unit.id} value={unit.id}>{unit.name}</option>)}
+				  </Form.Select>
+			  </Form.Group>
+			  <Form.Group className="mb-3">
+				  <Form.Check
+	          type={'checkbox'}
+	          label={`Please Check this`}
+	          id={`1`}
+	          value={`1`}
+	          name="isActive"
+	          checked={state.isActive}
+	          onChange={onChange}
+	       />
+			  </Form.Group>
+			  <Button variant="primary" type="submit">
+			     Submit
+			  </Button>
 			</Form>
 		</Container>
 	);
